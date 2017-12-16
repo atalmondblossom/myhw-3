@@ -13,7 +13,7 @@ p_meta find_meta(p_meta *last, size_t size) {
   switch(fit_flag){
     case FIRST_FIT:
     {
-      //FIRST FIT CODE
+      //FIRST FIT CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
     break;
 
