@@ -47,39 +47,47 @@ p_meta find_meta(p_meta *last, size_t size) {
 }
 
 void *m_malloc(size_t size) {
-	p_meta new=base;
-	p_meta prev=base;
-	p_meta next=base;
-	p_meta temp=base;
+  p_meta new = base;
+  p_meta temp = base;
+  p_meta last = base;
 
-	if(new = find_meta(&last, size)){ 
-    	if(new->size > size + META_SIZE){ 
-      next = new->next;               
-      temp->next = next;
-      temp->prev = new;
-      temp->size = new->size - META_SIZE; 
-      temp->free = 1;                     
+  if(head == 0){ 
+    new = sbrk(META_SIZE);
+    new->free = 0;
+    new->data[0] = sbrk(size);
+    new->size = size;
+    head = new;
+    new->next = base;
+    new->prev = head;
+    
+    return new->data[0];
+  }
+
+  if(new = find_meta(&last, size)){ 
+    if(new->size > size + META_SIZE){ 
+      temp = new + META_SIZE + size;
+      temp->next = new->next;
       new->next = temp;
-      next->prev = temp;
+      temp->prev = new;
+      temp->free = 1;
+      temp->size = size - META_SIZE;
     }
     new->free = 0;
-    return new + META_SIZE;
-  }
-  else{                             
-    new = sbrk(META_SIZE);
-    sbrk(size);
-    temp = last->prev;
-    last = sbrk(0);
-    new->prev = temp;
-    new->next = last;
-    temp->next = new;
-    last->prev = new;
     new->size = size;
+    new->data[0] = new + META_SIZE;
+    return new->data[0];
+  }
+  else{
+    new = sbrk(META_SIZE);
     new->free = 0;
-    return new + META_SIZE;
-}
-
-
+    new->data[0] = sbrk(size);
+    new->size = size;
+    last->next = new;
+    new->prev = last;
+    new->next = base;
+    
+    return new->data[0];
+  }
 }
 
 void m_free(void *ptr) {
